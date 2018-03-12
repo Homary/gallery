@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>仿海报画廊</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- <script type="text/javascript" src="js.js"></script> -->
+	<script type="text/javascript" src="image/data.js"></script>
+	<meta charset="utf-8">
+</head>
+<body onselectstart="return false">
+	<!-- 防止页面文件被选中 -->
+	<dvi id="wrap" class="wrap">
+		<div class="photo photo-front" id="photo_{{index}}" onclick="turn(this)">
+		<!-- 负责平移与旋转 -->
+			<div class="photo-wrap">
+			<!-- 负责翻转 -->
+				<div class="side side-front">
+				<!-- 图片正面 -->
+					<p class="image"><img src="image/{{img}}" alt="海报画廊"></p>
+					<!-- 图片 -->
+					<p class="caption">{{caption}}</p>
+					<!-- 标题 -->
+				</div>
+				<div class="side side-back">
+				<!-- 图片反面 -->
+					<p class="desc">{{desc}}</p>
+				</div>
+				<!-- {{index}},{{img}},{{caption}},{{desc}}用于模板替换 -->
+			</div>
+		</div>
+	</dvi>
+	<script type="text/javascript">
+//通用函数
+//substr(0,1)函数,从0开始,切1个字符
+function g(selector){
+	var method = selector.substr(0,1) == '.'?'getElementsByClassName':'getElementById';
+	return document[method](selector.substr(1));
+	// 传入选择器,返回一个数组
+}
+
+//随机数发生器 random([min,max])
+function random(range){
+	var max = Math.max(range[0],range[1]);
+	var min = Math.min(range[0],range[1]);
+
+	var daff = max - min;
+	var number = Math.floor(Math.random()*daff + min);
+	return number;
+}
+//2.输出所有海报
+//1).导入data
+//如果把js放在单独的文件中,则var template = g('#wrap').innerHTML;会报错????????
+//2).join()函数将数组转换为字符串,若无参数则默认以,为分隔号
+function addPhotos(){
+	var template = g('#wrap').innerHTML;
+	var html = [];
+	//添加控制按钮
+	var nav = [];
+
+	for(s in data){
+		var _html = template
+					.replace('{{index}}',s)
+					.replace('{{img}}',data[s].img)
+					.replace('{{caption}}',data[s].caption)
+					.replace('{{desc}}',data[s].desc);
+			html.push(_html);
+		nav.push('<span id="nav_' + s + '" class="i"  onclick = "turn(g(\'#photo_' + s + '\'))">'+ s +'</span>');
+	}
+	html.push('<div class="nav">' + nav.join('') + '</div>');
+	//输出到页面
+	g('#wrap').innerHTML = html.join('');
+	rsort(0);	
+}
+	addPhotos();
+	//3.计算左右分区的范围
+function range(){
+		var range = {
+				left:{
+					x:[],
+					y:[]
+				},
+				right:{
+					x:[],
+					y:[]
+				}
+		};
+
+		var wrap = {
+				w : g('#wrap').clientWidth,
+				h : g('#wrap').clientHeight
+		};
+		var photo = {
+				w : g('.photo')[0].clientWidth,
+				h : g('.photo')[0].clientHeight
+		};
+		range.wrap = wrap;
+		range.photo = photo;
+
+		range.left.x = [0-photo.w , wrap.w/2-photo.w/2];
+		range.left.y = [0-photo.h , wrap.h];
+
+		range.right.x = [wrap.w/2+photo.w/2 , wrap.w];
+		range.right.y = range.left.y;
+
+		return range;
+	}
+	//4.排序海报
+	function rsort(n){
+		var _photo = g('.photo');
+		var photos = [];
+
+		for(s=0; s<_photo.length; s++){
+			_photo[s].className = _photo[s].className.replace(/\s*photo-center\s*/, " ");
+			_photo[s].className = _photo[s].className.replace(/\s*photo-back\s*/, " ");
+		//清空样式要替换为空格字符
+			_photo[s].style.left ="";
+			_photo[s].style.top ="";
+			_photo[s].style['-webkit-transform']='rotate(0deg) scale(1.1)';
+				//转化为数组
+			photos.push(_photo[s]);
+		}
+
+		//设置中间海报
+		var photo_center = g('#photo_' + n);
+		    photo_center.className +=" photo-center ";
+			//从数组中删除中间海报
+			photos.splice(n,1);
+		
+
+			//剩下的海报分为两个部分
+		var photo_left = photos.splice(0,Math.ceil(photos.length/2));
+		var photo_right = photos;
+		//分配海报
+		var ranges = range();//返回是一个数组
+		for(var s in photo_left){
+			//分配位置
+			var photo = photo_left[s];
+				photo.style.left = random(ranges.left.x) + 'px';
+				photo.style.top = random(ranges.left.y) + 'px';
+			//分配角度
+			//photo.style['-webkit-transform'] = 'translate(10px,100px)';
+			photo.style['-webkit-transform'] = 'rotate('+random([-150,150])+'deg) scale(0.8)'; 
+		}
+		for(var s in photo_right){
+			var photo = photo_right[s];
+				photo.style.left = random(ranges.right.x) + 'px';
+				photo.style.top = random(ranges.right.y) + 'px';
+				//photo.style['-webkit-transform'] = 'translate(10px,100px)';
+				photo.style['-webkit-transform'] = 'rotate(' +random([-160,160])+ 'deg) scale(0.8)';
+		}
+		//控制按钮
+		var navs = g('.i');
+		for(var i=0; i<navs.length; i++){
+			navs[i].className = navs[i].className.replace(/\s*i_curren\s*/,' ');
+			navs[i].className = navs[i].className.replace(/\s*i_back\s*/,' ');
+		}
+		g('#nav_'+n).className += ' i_current ';
+		
+	}
+//1.翻转图片
+//传入元素,判断元素的className
+//如果className中有photo-front则用photo-back替换
+//正则:test(), replace()
+//如果className中有photo-back则用photo-front替换
+function turn(elem){
+	var cls = elem.className;
+	var n = elem.id.split('_')[1];
+
+	if(!/photo-center/.test(cls)){
+		return rsort(n);
+	}
+	if(/photo-front/.test(cls)){
+		cls = cls.replace(/photo-front/,'photo-back');
+		g('#nav_'+n).className += 'i_back';
+	}
+	else{
+		cls = cls.replace(/photo-back/,'photo-front');
+		g('#nav_'+n).className = g('#nav_'+n).className.replace(/\s*i_back\s*/,' ');
+	}
+	return elem.className = cls;
+}
+	</script>
+</body>
+</html>

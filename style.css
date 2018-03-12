@@ -1,0 +1,135 @@
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    body{
+      /*background-image: url(images/bg.jpg);*/
+      background-color: #fff;
+      color: #555;
+      font-family: '方正舒体','Avenir Next','微软雅黑';
+      font-size: 14px;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{
+      width: 100%;
+      height: 480px;
+      position: absolute;
+      top:50%;
+      margin-top: -240px;
+      background-color: #333;
+      overflow: hidden;
+    }
+    .photo{
+      width: 260px;
+      height: 320px;
+      left: 50%;
+      top:50%;
+      margin: -160px 0 0 -130px;
+      position: absolute;
+      z-index: 1;
+      box-shadow: 0 0 1px rgba(0 0 0 0.5);
+
+      -webkit-transition: all .8s;
+    }
+    .photo .side{
+      width: 100%;
+      height: 100%;
+      background-color: #eee;
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 10px;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+    
+    .photo .side-front .image{
+      width: 100%;
+      height: 250px;
+      line-height: 250px;
+      overflow: hidden;
+      padding-top: 30px;
+      box-sizing: border-box;
+    }
+    .photo .side-front .image img{
+      width: 100%;
+    }
+    .photo .side-front .caption{
+      text-align: center;
+      font-size: 16px;
+      line-height: 50px;
+      padding-bottom: 50px;
+    }
+    
+    .photo .side-back .desc{
+      padding-top: 35px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5em;
+    }
+    .photo-center{
+      width: 260px;
+      height: 320px;
+      left: 50%;
+      top: 50%;
+      margin: -160px 0 0 -130px;
+      z-index: 999;
+    }
+    .photo-wrap{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+
+      -webkit-transform-style: preserve-3d;
+      -webkit-transform-origin: 0% 50%;
+      -webkit-transition: all .8s;
+    }
+   /* 初始正面显示,背面隐藏*/
+    .photo-wrap .side-front{
+      -webkit-transform: translate(0px,0px) rotateY(0deg);
+    }
+    .photo-wrap .side-back{
+      -webkit-transform: rotateY(180deg);
+    }
+    .photo-wrap .side{
+      -webkit-backface-visibility: hidden;
+    }
+    /*用于点击翻面*/
+    .photo-back .photo-wrap{
+      -webkit-transform: translate(260px,0px) rotateY(180deg);
+    }
+
+    .nav{
+      width: 60%;
+      height: 30px;
+      position: absolute;
+      left: 20%;
+      z-index: 999;
+      bottom: 5px;
+      text-align: center;
+      font-size: 30px;
+    }
+
+    .nav .i{
+      width: 30px;
+      height: 30px;
+      display: inline-block;
+      border-radius: 50%;
+      cursor: pointer;
+
+      -webkit-transition: all 0.8s;
+      -webkit-transform: scale(0.48);
+    }
+   /* .nav .i:hover{
+      text-align: center;
+      background-color: #CCC;
+      -webkit-transform: scale(0.8);
+    }*/
+    .nav .i_current{
+      -webkit-transform: scale(1);
+    }
+    .nav .i_back{
+      -webkit-transform: rotate(180deg);
+      background-color: #555;
+    }
